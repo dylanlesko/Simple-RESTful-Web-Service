@@ -30,11 +30,12 @@
 
 	    
 ### Running the Program
-	1. Running the Server
+	1. Running the Database
+		Open a new Terminal and launch mongo
+	2. Running the Server
 		cd $HOME/go/src/Simple-RESTful-Web-Service/
 		go run srest.go
-	3. Running the Database
-		Open a new Terminal and launch mongo
+
 
 ### Testing the Program
 	With the Server and Mongo running
