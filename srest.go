@@ -20,48 +20,28 @@ import (
 )
 
 /* main.go */
-type msg struct {
-	Id bson.ObjectId `bson:"_id"`
-	Msg string `bson:"msg"`
-	Count int `bson:"count"`
-} 
-
 func main() {
-
-
-
-
 	router := NewRouter()
-
-
-	//net.Listen("tcp6", "ip6-localhost:1234")
-
 	log.Fatal(http.ListenAndServe(":1234", router))
-
-
-
 }
 /* end main.go */
 
-
 /* router.go */
 func NewRouter() *mux.Router {
-    router := mux.NewRouter().StrictSlash(true)
-    for _, route := range routes {
-        var handler http.Handler
-        handler = route.HandlerFunc
-        handler = Logger(handler, route.Name)
+	router := mux.NewRouter().StrictSlash(true)
+	for _, route := range routes {
+		var handler http.Handler
+		handler = route.HandlerFunc
+		handler = Logger(handler, route.Name)
 
-        router.
-            Methods(route.Method).
-            Path(route.Pattern).
-            Name(route.Name).
-            Handler(handler)
-
-    }
-    return router
+		router.
+			Methods(route.Method).
+			Path(route.Pattern).
+			Name(route.Name).
+			Handler(handler)
+	}
+	return router
 }
-
 /* End router.go */
 
 /* Routes.go */
@@ -71,37 +51,50 @@ type Route struct {
     Pattern     string
     HandlerFunc http.HandlerFunc
 }
-
 type Routes []Route
 
 var routes = Routes{
+	/* Homepage */
 	Route{
 		"Index",
 		"GET",
 		"/",
 		Index,
 	},
-	
-    	Route{
-    		"StudentPost",
-    		"POST",
-    		"/Student",
-    		StudentPost,
-
+	/* POST Route for Create */
+	Route{
+		"StudentPost",
+		"POST",
+		"/Student",
+		StudentPost,
 	},
-    	Route{
-    		"StudentGet",
-    		"GET",
-    		"/Student/getstudent",
-    		StudentGet,
-
+	/* POST Route for Read */
+	Route{
+		"StudentGet",
+		"GET",
+		"/Student/getstudent",
+		StudentGet,
 	},
-    	Route{
-    		"listall",
-    		"GET",
-    		"/Student/listall",
-    		StudentList,
-
+	/* POST Route for Delete*/
+	Route{
+		"StudentDelete",
+		"DELETE",
+		"/Student",
+		StudentDelete,
+	},
+	/* POST Route for Update */
+	Route{
+		"StudentPut",
+		"PUT",
+		"/Student",
+		StudentPut,
+	},
+	/* Post Route for List All*/
+	Route{
+		"listall",
+		"GET",
+		"/Student/listall",
+		StudentList,
 	},
 }
 /* End Routes.go */
@@ -109,15 +102,23 @@ var routes = Routes{
 
 /* students.go */
 type Student struct {
-	NetID bson.ObjectId `json: "id" bson:"_id"`
-	Name string `json: "name"bson:"name"`
-	Major string `json: "major"bson:"major"`
-	Year int `json: "year"bson:"year"`
-	Grade int `json: "grade"bson:"grade"`
-	Rating string `json: "rating"bson:"rating"`
+	Id bson.ObjectId `json: "id" bson:"_id,omitempty"`
+	NetID string `json: "nid" bson:"netid"`
+	Name string `json: "name" bson:"name"`
+	Major string `json: "major" bson:"major"`
+	Year int `json: "year" bson:"year"`
+	Grade int `json: "grade" bson:"grade"`
+	Rating string `json: "rating" bson:"rating"`
 }
-
 type Students []Student
+type StudentString struct {
+	NetID string `json: "nid"`
+	Name string `json: "name"`
+	Major string `json: "major"`
+	Year int `json: "year"`
+	Grade int `json: "grade"`
+	Rating string `json: "rating"`
+}
 /* End students.go */
 
 
@@ -125,77 +126,20 @@ type Students []Student
 func Index(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "Welcome!")
 }
-
-
-
-
 func StudentPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	r.ParseForm()
-	//test := r.PostForm()
-	fmt.Printf("%+v\n", r.Form)
+	//fmt.Printf("body\n", r.PostForm   )
 
 	dec := json.NewDecoder(r.Body)
-	var data Student
+	var data StudentString
 	dec.Decode(&data)
 
-	fmt.Printf(data.Name, data.Major, data.Year, data.Grade, data.Rating)
-    
-	//var s Student
-	//err := json.Unmarshal(r, &s)
-
-//	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-
-	
-	//byt := []byte(r.Body)
-	
-//	if err := json.Unmarshal(byt, &s); err != nil {
-//		panic(err)
-//		}
+//	newS := &Student{ ID:bson.NewObjectId(), NetID:data.NetID, Name:data.Name, Major:data.Major, Year:data.Year, Grade:data.Grade, Rating:data.Rating}
 
 
 
-
-	//err := json.Unmarshal( (r.URL.Path), &s )
-
-
-/*
-	//req := r.Ctx.Request     //in beego this.Ctx.Request points to the Http#Request
-	p := make([]byte, r.ContentLength)    
-	_, err := r.Body.Read(p)
-	if err == nil {
-		var newStudent Student
-		err1 := json.Unmarshal(p, &newStudent)
-		if err1 == nil {
-			fmt.Println(newStudent)
-		} else {
-			fmt.Println("Unable to unmarshall the JSON request", err1);
-
-		}
-	}
-
-
-
-
-
-
-	fmt.Fprintf(w, "hello")
-	//m, _  := url.ParseRequestURI(r.URL)
-
-	decoder := json.NewDecoder(r.Body)
-	var t Student   
-	err = decoder.Decode(&t)
-	if err != nil {
-		panic(err)
-	}
-	log.Println(t.Name)
-*/
-
-	//fmt.Fprintf(w, m)
-	//fmt.Printf("url: %s\n", r.URL.RawQuery)
-
-/*	
 	uri := "mongodb://localhost:27017"
 
 	sess, err := mgo.Dial(uri)
@@ -206,21 +150,24 @@ func StudentPost(w http.ResponseWriter, r *http.Request) {
 	defer sess.Close()
 
 	sess.SetSafe(&mgo.Safe{})
-*/
 
-/*
 	collection := sess.DB("test").C("student")
 
-	//newS := Student{NetID: t.NetID, Name: t.Name, Major: t.Major, Year: t.Year, Grade: t.Grade, Rating: t.Rating}
-	newS := Student{NetID: "dfg455367", Name: "Jayyy", Major: "Comp Sci", Year: 2016, Grade: 2, Rating: "D"}
+	newS := Student{}
+	newS.Id = bson.NewObjectId()
+	newS.NetID = data.NetID
+	newS.Major = data.Major
+	newS.Year = data.Year
+	newS.Grade = data.Grade
+	newS.Rating = data.Rating
 
-	err = collection.Insert(&newS)
-	if err != nil {
-		fmt.Printf("Can't insert document: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Fprintf(w, newS.Name)
-*/
+
+
+	collection.Insert(&newS)
+
+	fmt.Fprintln(w, "Inserted: ")
+	fmt.Fprintln(w, newS)
+	fmt.Fprintln(w, "into test.Student")
 }
 func StudentGet(w http.ResponseWriter, r *http.Request) {
 	
@@ -235,85 +182,183 @@ func StudentGet(w http.ResponseWriter, r *http.Request) {
 
 	sess.SetSafe(&mgo.Safe{})
 
-
 	collection := sess.DB("test").C("student")
 	
-
-
 	m, _  := url.ParseQuery(r.URL.RawQuery)
 	search := (m["name"][0])
 
-	result := Student{}
-	err = collection.Find(bson.M{"name": search}).One(&result)
+	result := []StudentString{}
+	err = collection.Find(bson.M{"name": search}).All(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	resLen := len(result)
+	output := strconv.Itoa(resLen) + " Results Found\n"
 
-
-
-
-
-	output := "NetID:\t"
-	//id := Hex(result.NetID)
-	id := result.NetID.Hex
-	//hex.Dump(result.NetID.Hex)
-	fmt.Printf("%s", id)
-	//output = output + id
-	//output = output + strconv.Itoa(id)
-	output = output + "\nName:\t"
-	output = output + result.Name
-	output = output + "\nMajor:\t"
-	output = output + result.Major
-	output = output + "\nYear:\t"
-	year := result.Year
-	output = output + strconv.Itoa(year)
-	output = output + "\nGrade:\t"
-	grade := result.Grade
-	output = output + strconv.Itoa(grade)
-	output = output + "\nRating:\t"
-	output = output + result.Rating
-
+	a := 0
+	for a < resLen {
+		output = output + "\nResult " + strconv.Itoa(a+1)
+		output = output + "\n\tNetID:\t"
+		output = output + result[a].NetID
+		output = output + "\n\tName:\t"
+		output = output + result[a].Name
+		output = output + "\n\tMajor:\t"
+		output = output + result[a].Major
+		output = output + "\n\tYear:\t"
+		output = output + strconv.Itoa(result[a].Year)
+		output = output + "\n\tGrade:\t"
+		output = output + strconv.Itoa(result[a].Grade)
+		output = output + "\n\tRating:\t"
+		output = output + result[a].Rating
+		a++
+	}
+	
 	fmt.Fprintf(w, output)
 }
-func StudentPut(w http.ResponseWriter, r *http.Request) {
-	
 
-}
 func StudentDelete(w http.ResponseWriter, r *http.Request) {
-	
 
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	r.ParseForm()
+
+	dec := json.NewDecoder(r.Body)
+	var data StudentString
+	dec.Decode(&data)
+
+	fmt.Println(data.Year)
+
+	year := data.Year
+
+	uri := "mongodb://localhost:27017"
+
+	sess, err := mgo.Dial(uri)
+	if err != nil {
+		fmt.Printf("Can't connect to mongo, go error %v\n", err)
+		os.Exit(1)
+	} 
+	defer sess.Close()
+
+	sess.SetSafe(&mgo.Safe{})
+
+	collection := sess.DB("test").C("student")
+
+	collection.RemoveAll( bson.M{ "year": bson.M{"$lt": year}  }  )
+
+	fmt.Fprintln(w, "Removed Years Before")
+	fmt.Fprint(w, year)
 }
+func StudentPut(w http.ResponseWriter, r *http.Request) {
+	uri := "mongodb://localhost:27017"
+	sess, err := mgo.Dial(uri)
+	if err != nil {
+		fmt.Printf("Can't connect to mongo, go error %v\n", err)
+		os.Exit(1)
+	} 
+	defer sess.Close()
 
+	sess.SetSafe(&mgo.Safe{})
 
+	collection := sess.DB("test").C("student")
+
+	result := []Student{}
+	err = collection.Find(bson.M{}).All(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resLen := len(result)
+	total := 0
+	a := 0
+	for a < resLen {
+		total = total + result[a].Grade
+		a++
+	}
+	average := total/resLen
+	
+	A_avg := average + 10
+	B_avg := average - 10
+	C_avg := average - 20
+
+	changeA := bson.M{"$set": bson.M{"rating": "A"}}
+	changeB := bson.M{"$set": bson.M{"rating": "B"}}
+	changeC := bson.M{"$set": bson.M{"rating": "C"}}
+
+	searchA := bson.M{
+		"grade": bson.M{"$gt": A_avg},
+	}
+	searchB := bson.M{
+		"grade": bson.M{"$gt": B_avg},
+	}
+	searchC := bson.M{
+		"grade": bson.M{"$gt": C_avg},
+	}
+
+	collection.UpdateAll(searchC, changeC)
+	collection.UpdateAll(searchB, changeB)
+	collection.UpdateAll(searchA, changeA)
+}
 func StudentList(w http.ResponseWriter, r *http.Request) {
+	uri := "mongodb://localhost:27017"
+	sess, err := mgo.Dial(uri)
+	if err != nil {
+		fmt.Printf("Can't connect to mongo, go error %v\n", err)
+		os.Exit(1)
+	} 
+	defer sess.Close()
 
+	sess.SetSafe(&mgo.Safe{})
 
+	collection := sess.DB("test").C("student")
+	
+	result := []StudentString{}
+	err = collection.Find(bson.M{}).All(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	resLen := len(result)
+	output := strconv.Itoa(resLen) + " Results Found\n"
 
-
-
-
-
-
+	a := 0
+	for a < resLen {
+		output = output + "\nResult " + strconv.Itoa(a+1)
+		output = output + "\n\tNetID:\t"
+		output = output + result[a].NetID
+		output = output + "\n\tName:\t"
+		output = output + result[a].Name
+		output = output + "\n\tMajor:\t"
+		output = output + result[a].Major
+		output = output + "\n\tYear:\t"
+		output = output + strconv.Itoa(result[a].Year)
+		output = output + "\n\tGrade:\t"
+		output = output + strconv.Itoa(result[a].Grade)
+		output = output + "\n\tRating:\t"
+		output = output + result[a].Rating
+		a++
+	}
+	
+	fmt.Fprintf(w, output)
 }
 /* End handlers.go*/
 
 
 /* logger.go */
 func Logger(inner http.Handler, name string) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        start := time.Now()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 
-        inner.ServeHTTP(w, r)
+		inner.ServeHTTP(w, r)
 
-        log.Printf(
-            "%s\t%s\t%s\t%s",
-            r.Method,
-            r.RequestURI,
-            name,
-            time.Since(start),
-        )
-    })
+		log.Printf(
+			"%s\t%s\t%s\t%s",
+			r.Method,
+			r.RequestURI,
+			name,
+			time.Since(start),
+		)
+	})
 }
 /* End logger.go */
+
