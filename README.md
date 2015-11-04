@@ -10,17 +10,16 @@
 	        -bin/
 	        -pkg/
 	        -src/
-		        -main/
+		        -Simple-RESTful-Web-Service/
 			        -main.go/
+			        -README
+			        -test/
+				        -test.go/
     - Environment Variables
 	    export GOPATH=$HOME/go/
-    - Package Installation
-	    1. Option 1-
-		    cd ~/go/src/main
+    - Go Package Installation
+		    cd ~/go/src/Simple-RESTful-Web-Service/
 		    go get
-	    2. Option 2-
-		    I noticed the mongo packages took me a long time to download, so I will 
-		    include a zipped copy of downloaded packages.
     -mongoDB
 	    Installed mongoDB by following these instructions[1]
 	    -sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -31,7 +30,17 @@
 
 	    
 ### Running the Program
-	navigate to $HOME/go/src/main/ 
+	1. Running the Server
+		cd $HOME/go/src/Simple-RESTful-Web-Service/
+		go run srest.go
+	3. Running the Database
+		Open a new Terminal and launch mongo
+
+### Testing the Program
+	With the Server and Mongo running
+	cd $HOME/go/src/Simple-RESTful-Web-Service/test
+	
+> Examples:
 > POST Operation
 >> $ go run test.go  -url="http://localhost:1234/Student" -method=Create  -data=’{"NetID":"147001234", "Name":"Mike","Major":"Computer Science","Year":2015,"Grade":90,"Rating":"D"}’
 
