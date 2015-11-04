@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>A Simple RESTFUL Program</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 <h1 id="a-simple-restful-program">A Simple RESTFUL Program</h1>
 
@@ -19,17 +27,16 @@ mongodb
         -bin/
         -pkg/
         -src/
-            -main/
+            -Simple-RESTful-Web-Service/
                 -main.go/
+                -README
+                -test/
+                    -test.go/
 - Environment Variables
     export GOPATH=$HOME/go/
-- Package Installation
-    1. Option 1-
-        cd ~/go/src/main
+- Go Package Installation
+        cd ~/go/src/Simple-RESTful-Web-Service/
         go get
-    2. Option 2-
-        I noticed the mongo packages took me a long time to download, so I will 
-        include a zipped copy of downloaded packages.
 -mongoDB
     Installed mongoDB by following these instructions[1]
     -sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -39,48 +46,60 @@ mongodb
     -sudo apt-get install -y mongodb-org
 </code></pre>
 
-
-
 <h3 id="running-the-program">Running the Program</h3>
 
-<pre><code>navigate to $HOME/go/src/main/ 
+<pre><code>1. Running the Server
+    cd $HOME/go/src/Simple-RESTful-Web-Service/
+    go run srest.go
+3. Running the Database
+    Open a new Terminal and launch mongo
+</code></pre>
+
+
+
+<h3 id="testing-the-program">Testing the Program</h3>
+
+<pre><code>With the Server and Mongo running
+cd $HOME/go/src/Simple-RESTful-Web-Service/test
 </code></pre>
 
 <blockquote>
-  <p>POST Operation</p>
+  <p>Examples: <br>
+  POST Operation</p>
   
   <blockquote>
-    <p>$ go run test.go  -url=â€http://localhost:1234/Studentâ€ -method=Create  -data=â€™{â€œNetIDâ€:â€147001234â€, â€œNameâ€:â€Mikeâ€,â€Majorâ€:â€Computer Scienceâ€,â€Yearâ€:2015,â€Gradeâ€:90,â€Ratingâ€:â€Dâ€}â€™</p>
+    <p>$ go run test.go  -url=”http://localhost:1234/Student” -method=Create  -data=’{“NetID”:”147001234”, “Name”:”Mike”,”Major”:”Computer Science”,”Year”:2015,”Grade”:90,”Rating”:”D”}’</p>
   </blockquote>
   
   <p>GET Operation</p>
   
   <blockquote>
-    <p>$ go run test.go  -url=â€http://localhost:1234/Student/getstuent?name=Maryâ€ -method=list</p>
+    <p>$ go run test.go  -url=”http://localhost:1234/Student/getstuent?name=Mary” -method=list</p>
   </blockquote>
   
   <p>DELETE Operation</p>
   
   <blockquote>
-    <p>$ go run test.go â€“url=â€http://localhost:1234/Studentâ€ -method=remove  -year=2010</p>
+    <p>$ go run test.go –url=”http://localhost:1234/Student” -method=remove  -year=2010</p>
   </blockquote>
   
   <p>Update Operation</p>
   
   <blockquote>
-    <p>$ go run test.go â€“url=â€http://localhost:1234/Studentâ€ -method=update</p>
+    <p>$ go run test.go –url=”http://localhost:1234/Student” -method=update</p>
   </blockquote>
   
   <p>LIST Operation</p>
   
   <blockquote>
-    <p>$ go run test.go -url=â€http://localhost:1234/Student/listallâ€ -method=list</p>
+    <p>$ go run test.go -url=”http://localhost:1234/Student/listall” -method=list</p>
   </blockquote>
 </blockquote>
-
-
 
 <h3 id="external-links">External Links</h3>
 
 <pre><code>[1]: https://docs.mongodb.org/getting-started/shell/tutorial/install-mongodb-on-ubuntu/#install-mongodb
 </code></pre>
+
+
+</html>
